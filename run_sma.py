@@ -2,28 +2,26 @@
 # -*- coding: utf-8 -*-
 
 """
-Run the Rebound Strategy backtest using the shared strategy runner
+Run the SMA Crossover Strategy backtest using the shared strategy runner
 """
 
 import sys
 from data_handler import download_spy_data
-from rebound_strategy import ReboundStrategy
+from sma_crossover_strategy import SmaCrossStrategy
 from strategy_runner import run_strategy_backtest, parse_common_args
 
 
-def get_rebound_csv_fields():
-    """Get the extra CSV fields specific to the Rebound strategy"""
-    def get_purchase_price(strategy):
-        return strategy.purchase_price if hasattr(strategy, 'purchase_price') else float('nan')
+def get_sma_csv_fields():
+    """Get the extra CSV fields specific to the SMA Crossover strategy"""
+    def get_fast_sma(strategy):
+        return strategy.fast_sma[0] if hasattr(strategy, 'fast_sma') else float('nan')
     
-    def get_price_change_pct(strategy):
-        if hasattr(strategy, 'purchase_price') and strategy.purchase_price and strategy.position:
-            return (strategy.data.close[0] - strategy.purchase_price) / strategy.purchase_price * 100
-        return float('nan')
+    def get_slow_sma(strategy):
+        return strategy.slow_sma[0] if hasattr(strategy, 'slow_sma') else float('nan')
     
     return [
-        ('PurchasePrice', get_purchase_price),
-        ('PriceChangePct', get_price_change_pct)
+        ('FastSMA', get_fast_sma),
+        ('SlowSMA', get_slow_sma)
     ]
 
 
@@ -32,9 +30,8 @@ if __name__ == '__main__':
     parser = parse_common_args()
     
     # Add strategy-specific arguments
-    parser.add_argument('--drop', type=float, default=0.10, help='Drop threshold (e.g., 0.10 for 10%)')
-    parser.add_argument('--rise', type=float, default=0.20, help='Rise threshold (e.g., 0.20 for 20%)')
-    parser.add_argument('--lookback', type=int, default=5, help='Lookback period in days')
+    parser.add_argument('--fast', type=int, default=50, help='Fast SMA period')
+    parser.add_argument('--slow', type=int, default=200, help='Slow SMA period')
     
     args = parser.parse_args()
     
@@ -50,21 +47,20 @@ if __name__ == '__main__':
     
     # Set up strategy parameters
     strategy_params = {
-        'drop_threshold': args.drop,
-        'rise_threshold': args.rise,
-        'lookback_period': args.lookback
+        'fast_period': args.fast,
+        'slow_period': args.slow
     }
     
     # Run the backtest
     success = run_strategy_backtest(
-        strategy_class=ReboundStrategy,
+        strategy_class=SmaCrossStrategy,
         data_file=data_file,
         output_file=args.output,
         start_cash=args.cash,
         commission=args.commission,
         plot=not args.no_plot,
         strategy_params=strategy_params,
-        csv_fields=get_rebound_csv_fields()
+        csv_fields=get_sma_csv_fields()
     )
     
     if success:

@@ -15,8 +15,8 @@ def main():
     print("Starting clean run of SMA Crossover Strategy...")
     
     # Define file paths
-    data_file = "spy_data_clean.csv"
-    results_file = "backtest_results_clean.csv"
+    data_file = "spy_data.csv"
+    results_file = "backtest_results.csv"
     
     # Delete existing files if they exist
     print("Cleaning up existing files...")
@@ -31,10 +31,12 @@ def main():
     # Build the command
     cmd = [
         sys.executable,  # Use the current Python interpreter
-        "run_analysis.py",
-        "--force-download",
+        "run_backtest.py",
+        "--download",
         "--data", data_file,
-        "--output", results_file
+        "--output", results_file,
+        "--start-date", "2000-01-01",
+        "--end-date", "2023-12-31"
     ]
     
     # Run the command

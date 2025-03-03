@@ -1,4 +1,5 @@
-# This is a collection of scripts and notebooks for analyzing and trading stocks.
+# SPY Trading Strategies Backtester
+A comprehensive backtesting framework for various trading strategies on the S&P 500 ETF (SPY) using the Backtrader library. This project implements and tests multiple trading strategies with customizable parameters and detailed performance analysis.
 
 # Statistics
 | Strategy            | Average Annual Return | Final Cumulative Return | Annualized Return | Standard Deviation | Worst Year | Best Year |
@@ -10,96 +11,147 @@
 | Without Top 4 Days  | -0.90%                | 0.389561                | -3.09%            | 19.23%             | -56.50%    | 29.56%    |
 
 
+## Available Strategies
 
-# Conclusion
-* Missing the top 1 day of returns has a big impact on the performance of the strategy.
-* Missing the top 2 days of returns will eliminate equities advantage over bonds.
+### 1. Buy and Hold Strategy
+A baseline strategy that buys SPY with all available cash on the first day and holds until the end of the testing period.
 
-# SMA Crossover Strategy Backtest
+```bash
+python run_buy_and_hold.py [options]
+```
 
-This project implements a simple moving average (SMA) crossover strategy for the SPY ETF over a 30-year period using Backtrader.
+### 2. SMA Crossover Strategy
+A trend-following strategy that uses two Simple Moving Averages (fast and slow) to generate buy/sell signals.
 
-## Strategy Description
+```bash
+python run_backtest.py --fast 50 --slow 200 [options]
+```
 
-The strategy uses two simple moving averages:
-- Fast SMA (default: 50 days)
-- Slow SMA (200 days)
+Parameters:
+- `--fast`: Fast SMA period (default: 50)
+- `--slow`: Slow SMA period (default: 200)
 
-Trading rules:
-- Buy when the fast SMA crosses above the slow SMA
-- Sell when the fast SMA crosses below the slow SMA
+### 3. Market Momentum Strategy
+An aggressive strategy that combines multiple technical indicators (RSI, MACD, Moving Averages) for trading decisions.
+
+```bash
+python run_momentum.py [options]
+```
+
+Parameters:
+- `--fast-ma`: Fast moving average period (default: 10)
+- `--medium-ma`: Medium moving average period (default: 20)
+- `--rsi-period`: RSI calculation period (default: 14)
+- `--rsi-oversold`: RSI oversold threshold (default: 30)
+- `--rsi-overbought`: RSI overbought threshold (default: 70)
+- `--trail-percent`: Trailing stop percentage (default: 0.05)
+- `--risk-per-trade`: Risk per trade as fraction of portfolio (default: 0.02)
+
+### 4. Rebound Strategy
+A mean-reversion strategy that looks for significant price drops followed by rebounds.
+
+```bash
+python run_rebound.py [options]
+```
+
+Parameters:
+- `--drop`: Drop threshold (default: 0.10 for 10%)
+- `--rise`: Rise threshold (default: 0.20 for 20%)
+- `--lookback`: Lookback period in days (default: 5)
+
+## Common Options for All Strategies
+
+All strategy runners support the following common options:
+
+```bash
+--data DATA             Data file to use (default: spy_data.csv)
+--output OUTPUT         Output file for results (default: strategy_results.csv)
+--cash CASH            Starting cash amount (default: 10000.0)
+--commission COMM      Commission rate (default: 0.001)
+--no-plot             Disable plotting
+--download            Download fresh SPY data
+--start-date DATE     Start date for data download (default: 2000-01-01)
+--end-date DATE       End date for data download (default: 2023-12-31)
+```
 
 ## Project Structure
 
-- `sma_crossover_strategy.py`: Contains the main strategy implementation
-- `run_backtest.py`: Script to run the backtest and save results to CSV
-- `visualize_results.py`: Script to visualize the backtest results
-
-## Setup Environment
-
-### Using Conda
-
-```bash
-# Create a new conda environment
-conda create -n backtrader python=3.8
-conda activate backtrader
-
-# Install required packages
-conda install -c conda-forge pandas matplotlib numpy
-conda install -c conda-forge backtrader
-conda install -c conda-forge yfinance
+```
+├── strategy_runner.py          # Shared backtest functionality
+├── data_handler.py            # Data download and preprocessing
+├── strategies/
+│   ├── buy_and_hold_strategy.py
+│   ├── sma_crossover_strategy.py
+│   ├── market_momentum_strategy.py
+│   └── rebound_strategy.py
+├── runners/
+│   ├── run_buy_and_hold.py
+│   ├── run_backtest.py        # SMA Crossover runner
+│   ├── run_momentum.py
+│   └── run_rebound.py
+└── README.md
 ```
 
-### Using pip
+## Features
 
+- **Data Management**: Automatic download of SPY historical data
+- **Performance Metrics**: 
+  - Sharpe Ratio
+  - Maximum Drawdown
+  - Total Return
+  - Trade Statistics (win rate, number of trades)
+- **Visualization**: Candlestick charts with strategy indicators
+- **CSV Export**: Detailed trade data and performance metrics
+- **Modular Design**: Easy to add new strategies
+
+## Requirements
+
+- Python 3.7+
+- backtrader
+- pandas
+- matplotlib
+- yfinance (for data download)
+
+Install dependencies:
 ```bash
-# Create a virtual environment
-python -m venv backtrader_env
-source backtrader_env/bin/activate  # On Windows: backtrader_env\Scripts\activate
-
-# Install required packages
-pip install backtrader pandas matplotlib numpy yfinance
+pip install -r requirements.txt
 ```
 
-## Usage
+## Example Usage
 
-### Running the Backtest
-
+1. Download fresh SPY data and run the SMA Crossover strategy:
 ```bash
-# Run with default parameters
-python run_backtest.py
-
-# Run with custom parameters
-python run_backtest.py --cash 100000 --commission 0.0005 --fast 20 --slow 100
+python run_backtest.py --download --fast 50 --slow 200
 ```
 
-### Command Line Arguments
-
-- `--data`: Path to the data CSV file (default: 'spy_data.csv')
-- `--output`: Path to save the results CSV file (default: 'backtest_results.csv')
-- `--cash`: Initial cash amount (default: 10000.0)
-- `--commission`: Commission rate (default: 0.001)
-- `--fast`: Fast SMA period (default: 50)
-- `--slow`: Slow SMA period (default: 200)
-- `--no-plot`: Disable plotting
-
-### Visualizing Results
-
+2. Run the Market Momentum strategy with custom parameters:
 ```bash
-# Visualize the backtest results
-python visualize_results.py
-
-# Visualize custom results file
-python visualize_results.py --results custom_results.csv
+python run_momentum.py --rsi-oversold 35 --rsi-overbought 65 --trail-percent 0.03
 ```
 
-## Example Output
+3. Compare strategies by running them on the same data:
+```bash
+python run_buy_and_hold.py --data spy_data.csv
+python run_backtest.py --data spy_data.csv
+python run_momentum.py --data spy_data.csv
+python run_rebound.py --data spy_data.csv
+```
 
-The backtest will generate:
-1. Performance metrics in the console
-2. A CSV file with detailed results
-3. A plot showing the equity curve, drawdown, and buy/sell signals
+## Performance Analysis
+
+Each strategy run generates:
+1. A CSV file with detailed trade data and performance metrics
+2. Console output with key performance indicators
+3. Interactive plots showing price action and strategy signals
+
+## Contributing
+
+Feel free to contribute by:
+1. Adding new strategies
+2. Improving existing strategies
+3. Enhancing the analysis tools
+4. Reporting bugs or suggesting improvements
 
 ## License
 
-This project is open-source and available under the MIT License.
+MIT License - feel free to use this code for any purpose.

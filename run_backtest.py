@@ -43,6 +43,9 @@ class CSVWriter(bt.Analyzer):
         fast_sma = self.strategy.fast_sma[0]
         slow_sma = self.strategy.slow_sma[0]
         
+        # Get cash
+        cash = self.strategy.broker.getcash()
+        
         # Store the results
         self.results.append({
             'Date': date.isoformat(),
@@ -50,6 +53,7 @@ class CSVWriter(bt.Analyzer):
             'FastSMA': fast_sma,
             'SlowSMA': slow_sma,
             'Position': position,
+            'Cash': cash,
             'PortfolioValue': portfolio_value
         })
     
@@ -83,6 +87,9 @@ def run_backtest(data_file, output_file='backtest_results.csv', start_cash=10000
         cerebro.addstrategy(SmaCrossStrategy, 
                            fast_period=fast_period, 
                            slow_period=slow_period)
+        
+        # Set the default sizer to use 100% of available cash
+        cerebro.addsizer(bt.sizers.PercentSizer, percents=100)
         
         # Load the data
         print(f"Loading data from {data_file}...")

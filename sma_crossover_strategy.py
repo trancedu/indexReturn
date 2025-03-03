@@ -41,6 +41,9 @@ class SmaCrossStrategy(bt.Strategy):
         # To keep track of pending orders
         self.order = None
         
+        # Set the sizer to use all available cash (100%)
+        self.sizer = bt.sizers.PercentSizer(percents=100)
+        
     def log(self, txt, dt=None):
         """Logging function for this strategy"""
         dt = dt or self.datas[0].datetime.date(0)
@@ -54,9 +57,9 @@ class SmaCrossStrategy(bt.Strategy):
         # Check if an order has been completed
         if order.status in [order.Completed]:
             if order.isbuy():
-                self.log(f'BUY EXECUTED, {order.executed.price:.2f}')
+                self.log(f'BUY EXECUTED, {order.executed.price:.2f}, Size: {order.executed.size}, Cost: {order.executed.value:.2f}, Comm: {order.executed.comm:.2f}')
             elif order.issell():
-                self.log(f'SELL EXECUTED, {order.executed.price:.2f}')
+                self.log(f'SELL EXECUTED, {order.executed.price:.2f}, Size: {order.executed.size}, Cost: {order.executed.value:.2f}, Comm: {order.executed.comm:.2f}')
 
         elif order.status in [order.Canceled, order.Margin, order.Rejected]:
             self.log('Order Canceled/Margin/Rejected')
@@ -73,15 +76,26 @@ class SmaCrossStrategy(bt.Strategy):
         if not self.position:
             # Not in the market, look for buy signal
             if self.crossover > 0:  # Fast SMA crosses above slow SMA
+                cash = self.broker.getcash()
+                size = int(cash / self.data.close[0])  # Calculate how many shares we can buy
+                value = size * self.data.close[0]
+                
                 self.log(f'BUY CREATE, {self.data.close[0]:.2f}')
+                self.log(f'Using {value:.2f} of {cash:.2f} available cash to buy {size} shares')
+                
                 # Keep track of the created order to avoid a 2nd order
-                self.order = self.buy()
+                self.order = self.buy(size=size)
         else:
             # Already in the market, look for sell signal
             if self.crossover < 0:  # Fast SMA crosses below slow SMA
+                size = self.position.size
+                value = size * self.data.close[0]
+                
                 self.log(f'SELL CREATE, {self.data.close[0]:.2f}')
-                # Keep track of the created order to avoid a 2nd order
-                self.order = self.sell()
+                self.log(f'Selling all {size} shares for approximately {value:.2f}')
+                
+                # Use close() to sell all shares
+                self.order = self.close()
 
 
 def run_backtest(data_file, start_cash=10000.0, commission=0.001):

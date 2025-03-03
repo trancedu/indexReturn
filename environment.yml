@@ -1,0 +1,14 @@
+name: backtrader
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.12
+  - pandas
+  - matplotlib
+  - numpy
+  - pip
+  - pip:
+    - backtrader
+    - yfinance
+    - matplotlib 

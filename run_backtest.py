@@ -12,41 +12,8 @@ import argparse
 import sys
 
 import backtrader as bt
-from sma_crossover_strategy import SmaCrossStrategy, download_spy_data
-
-
-def check_and_fix_csv(csv_file):
-    """Check if the CSV file has the correct format and fix it if needed"""
-    if not os.path.exists(csv_file):
-        print(f"Error: CSV file {csv_file} does not exist")
-        return False
-    
-    try:
-        # Try to read the file with pandas
-        df = pd.read_csv(csv_file)
-        
-        print(f"CSV file structure:")
-        print(df.head(2))
-        
-        # Check for required columns
-        required_cols = ['Date', 'Open', 'High', 'Low', 'Close', 'Volume']
-        missing_cols = [col for col in required_cols if col not in df.columns]
-        
-        if missing_cols:
-            print(f"Error: Missing required columns: {missing_cols}")
-            return False
-            
-        # Add OpenInterest if missing
-        if 'OpenInterest' not in df.columns:
-            df['OpenInterest'] = 0
-            df.to_csv(csv_file, index=False)
-            print("Added OpenInterest column")
-        
-        return True
-        
-    except Exception as e:
-        print(f"Error checking CSV file: {e}")
-        return False
+from sma_crossover_strategy import SmaCrossStrategy
+from data_handler import download_spy_data, check_and_fix_csv
 
 
 class CSVWriter(bt.Analyzer):
@@ -66,35 +33,30 @@ class CSVWriter(bt.Analyzer):
         # Get current position
         position = self.strategy.position.size if self.strategy.position else 0
         
-        # Get current price
-        price = self.datas[0].close[0]
-        
         # Get current date
-        date = self.datas[0].datetime.date(0)
+        date = self.strategy.datas[0].datetime.date(0)
         
-        # Get signal (if any)
-        signal = 0
-        if hasattr(self.strategy, 'order') and self.strategy.order is not None:
-            if self.strategy.order.isbuy():
-                signal = 1
-            elif self.strategy.order.issell():
-                signal = -1
+        # Get current prices
+        close = self.strategy.datas[0].close[0]
         
-        # Store data
+        # Get SMA values
+        fast_sma = self.strategy.fast_sma[0]
+        slow_sma = self.strategy.slow_sma[0]
+        
+        # Store the results
         self.results.append({
-            'date': date,
-            'close': price,
-            'portfolio_value': portfolio_value,
-            'position': position,
-            'signal': signal
+            'Date': date.isoformat(),
+            'Close': close,
+            'FastSMA': fast_sma,
+            'SlowSMA': slow_sma,
+            'Position': position,
+            'PortfolioValue': portfolio_value
         })
     
     def stop(self):
         # Convert results to DataFrame and save to CSV
-        df = pd.DataFrame(self.results)
-        # Convert date objects to strings in the format expected by visualize_results.py
-        df['date'] = df['date'].apply(lambda x: x.strftime('%Y-%m-%d'))
-        df.to_csv(self.p.filename, index=False)
+        results_df = pd.DataFrame(self.results)
+        results_df.to_csv(self.p.filename, index=False)
         print(f"Results saved to {self.p.filename}")
 
 

@@ -10,6 +10,7 @@ import os
 import subprocess
 import sys
 import time
+from data_handler import download_spy_data
 
 def main():
     print("Starting clean run of SMA Crossover Strategy...")
@@ -28,15 +29,20 @@ def main():
             except Exception as e:
                 print(f"Error deleting file {file_path}: {e}")
     
+    # Download fresh data
+    print("Downloading fresh data...")
+    start_date = "2000-01-01"
+    end_date = "2023-12-31"
+    if not download_spy_data(start_date, end_date, data_file):
+        print("Error: Failed to download data")
+        return
+    
     # Build the command
     cmd = [
         sys.executable,  # Use the current Python interpreter
         "run_backtest.py",
-        "--download",
         "--data", data_file,
-        "--output", results_file,
-        "--start-date", "2000-01-01",
-        "--end-date", "2023-12-31"
+        "--output", results_file
     ]
     
     # Run the command

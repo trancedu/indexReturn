@@ -14,7 +14,9 @@ import sys
 import backtrader as bt
 import backtrader.feeds as btfeeds
 import pandas as pd
-import yfinance as yf
+
+# Import from data_handler instead
+from data_handler import download_spy_data
 
 
 class SmaCrossStrategy(bt.Strategy):
@@ -80,44 +82,6 @@ class SmaCrossStrategy(bt.Strategy):
                 self.log(f'SELL CREATE, {self.data.close[0]:.2f}')
                 # Keep track of the created order to avoid a 2nd order
                 self.order = self.sell()
-
-
-def download_spy_data(start_date, end_date, filename='spy_data.csv'):
-    """
-    Download SPY data from Yahoo Finance and save to CSV
-    """
-    try:
-        # Download SPY data
-        print(f"Downloading SPY data from {start_date} to {end_date}...")
-        spy_data = yf.download('SPY', start=start_date, end=end_date)
-        
-        if spy_data.empty:
-            print("Error: No data downloaded from Yahoo Finance")
-            return None
-            
-        print("Data downloaded successfully. Structure:")
-        print(spy_data.head(2))
-        
-        # Handle multi-index columns if present
-        if isinstance(spy_data.columns, pd.MultiIndex):
-            print("Detected multi-index columns. Flattening structure...")
-            spy_data.columns = spy_data.columns.get_level_values(0)
-        
-        # Reset the index to make Date a column
-        spy_data = spy_data.reset_index()
-        
-        # Add OpenInterest column (required by Backtrader)
-        spy_data['OpenInterest'] = 0
-        
-        # Save to CSV with proper format
-        spy_data.to_csv(filename, index=False)
-        print(f"Data saved to {filename}")
-        
-        return filename
-        
-    except Exception as e:
-        print(f"Error downloading SPY data: {e}")
-        return None
 
 
 def run_backtest(data_file, start_cash=10000.0, commission=0.001):

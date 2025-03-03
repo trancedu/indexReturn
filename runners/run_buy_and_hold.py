@@ -6,11 +6,6 @@ Run the Buy and Hold Strategy backtest using the shared strategy runner
 """
 
 import sys
-import os
-
-# Add parent directory to path to allow relative imports
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 from data_handler import download_spy_data
 from strategies.buy_and_hold_strategy import BuyAndHoldStrategy
 from strategy_runner import run_strategy_backtest, parse_common_args

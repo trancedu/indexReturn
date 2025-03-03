@@ -6,11 +6,6 @@ Run the SMA Crossover Strategy backtest using the shared strategy runner
 """
 
 import sys
-import os
-
-# Add parent directory to path to allow relative imports
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 from data_handler import download_spy_data
 from strategies.sma_crossover_strategy import SmaCrossStrategy
 from strategy_runner import run_strategy_backtest, parse_common_args

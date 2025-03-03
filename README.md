@@ -17,14 +17,14 @@ A comprehensive backtesting framework for various trading strategies on the S&P 
 A baseline strategy that buys SPY with all available cash on the first day and holds until the end of the testing period.
 
 ```bash
-python runners/run_buy_and_hold.py [options]
+python -m runners.run_buy_and_hold [options]
 ```
 
 ### 2. SMA Crossover Strategy
 A trend-following strategy that uses two Simple Moving Averages (fast and slow) to generate buy/sell signals.
 
 ```bash
-python runners/run_sma.py --fast 50 --slow 200 [options]
+python -m runners.run_sma --fast 50 --slow 200 [options]
 ```
 
 Parameters:
@@ -35,7 +35,7 @@ Parameters:
 An aggressive strategy that combines multiple technical indicators (RSI, MACD, Moving Averages) for trading decisions.
 
 ```bash
-python runners/run_momentum.py [options]
+python -m runners.run_momentum [options]
 ```
 
 Parameters:
@@ -51,7 +51,7 @@ Parameters:
 A mean-reversion strategy that looks for significant price drops followed by rebounds.
 
 ```bash
-python runners/run_rebound.py [options]
+python -m runners.run_rebound [options]
 ```
 
 Parameters:
@@ -77,22 +77,23 @@ All strategy runners support the following common options:
 ## Project Structure
 
 ```
-├── strategy_runner.py          # Shared backtest functionality
-├── data_handler.py            # Data download and preprocessing
-├── strategies/                # Strategy implementations
+├── __init__.py               # Root package marker
+├── strategy_runner.py        # Shared backtest functionality
+├── data_handler.py          # Data download and preprocessing
+├── strategies/              # Strategy implementations
 │   ├── __init__.py
 │   ├── buy_and_hold_strategy.py
 │   ├── sma_crossover_strategy.py
 │   ├── market_momentum_strategy.py
 │   └── rebound_strategy.py
-├── runners/                   # Strategy runner scripts
+├── runners/                 # Strategy runner scripts
 │   ├── __init__.py
 │   ├── run_buy_and_hold.py
-│   ├── run_sma.py            # SMA Crossover runner
+│   ├── run_sma.py          # SMA Crossover runner
 │   ├── run_momentum.py
 │   └── run_rebound.py
-├── requirements.txt           # Python dependencies
-└── README.md                 # This file
+├── requirements.txt         # Python dependencies
+└── README.md               # This file
 ```
 
 ## Features
@@ -124,20 +125,20 @@ pip install -r requirements.txt
 
 1. Download fresh SPY data and run the SMA Crossover strategy:
 ```bash
-python runners/run_sma.py --download --fast 50 --slow 200
+python -m runners.run_sma --download --fast 50 --slow 200
 ```
 
 2. Run the Market Momentum strategy with custom parameters:
 ```bash
-python runners/run_momentum.py --rsi-oversold 35 --rsi-overbought 65 --trail-percent 0.03
+python -m runners.run_momentum --rsi-oversold 35 --rsi-overbought 65 --trail-percent 0.03
 ```
 
 3. Compare strategies by running them on the same data:
 ```bash
-python runners/run_buy_and_hold.py --data spy_data.csv
-python runners/run_sma.py --data spy_data.csv
-python runners/run_momentum.py --data spy_data.csv
-python runners/run_rebound.py --data spy_data.csv
+python -m runners.run_buy_and_hold --data spy_data.csv
+python -m runners.run_sma --data spy_data.csv
+python -m runners.run_momentum --data spy_data.csv
+python -m runners.run_rebound --data spy_data.csv
 ```
 
 ## Performance Analysis

@@ -1,0 +1,13 @@
+{
+    "name": "sma-crossover-strategy",
+    "version": "0.1.0",
+    "description": "SMA Crossover Strategy for SPY using Backtrader",
+    "scripts": {
+        "clean-start": "rm -f spy_data_clean.csv backtest_results_clean.csv && python run_analysis.py --force-download --data spy_data_clean.csv --output backtest_results_clean.csv",
+        "backtest": "python run_backtest.py",
+        "visualize": "python visualize_results.py",
+        "analysis": "python run_analysis.py"
+    },
+    "author": "",
+    "license": "MIT"
+}

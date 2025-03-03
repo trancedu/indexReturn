@@ -13,6 +13,18 @@ import argparse
 import subprocess
 import datetime
 
+def delete_file_if_exists(file_path):
+    """Delete a file if it exists"""
+    if os.path.exists(file_path):
+        try:
+            os.remove(file_path)
+            print(f"Deleted existing file: {file_path}")
+            return True
+        except Exception as e:
+            print(f"Error deleting file {file_path}: {e}")
+            return False
+    return True
+
 def main():
     parser = argparse.ArgumentParser(description='Run SMA Crossover Strategy Analysis')
     parser.add_argument('--cash', type=float, default=10000.0,
@@ -54,6 +66,8 @@ def main():
         
     if args.force_download:
         backtest_cmd.append("--force-download")
+        # Delete the existing data file if force-download is specified
+        delete_file_if_exists(args.data)
     
     backtest_result = subprocess.run(backtest_cmd)
     

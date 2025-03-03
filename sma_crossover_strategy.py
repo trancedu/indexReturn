@@ -85,15 +85,66 @@ class SmaCrossStrategy(bt.Strategy):
 def download_spy_data(start_date, end_date, filename='spy_data.csv'):
     """Download SPY data from Yahoo Finance"""
     print(f"Downloading SPY data from {start_date} to {end_date}")
-    spy_data = yf.download('SPY', start=start_date, end=end_date)
     
-    # Ensure the index is in the correct format for Backtrader
-    spy_data.index = spy_data.index.strftime('%Y-%m-%d')
+    try:
+        # Download data from Yahoo Finance
+        spy_data = yf.download('SPY', start=start_date, end=end_date)
+        
+        # Check if we got any data
+        if spy_data.empty:
+            print("No data downloaded from Yahoo Finance.")
+            return None
+        
+        print("Data structure before processing:")
+        print(spy_data.head())
+        
+        # Handle multi-index columns if present
+        if isinstance(spy_data.columns, pd.MultiIndex):
+            print("Detected multi-index columns. Flattening structure...")
+            # Keep only the last level of the column index (actual column names)
+            spy_data.columns = spy_data.columns.get_level_values(0)
+        
+        # Make sure the data is properly formatted for Backtrader
+        # Reset the index to make Date a column
+        spy_data = spy_data.reset_index()
+        
+        # Ensure there are no empty date values
+        spy_data = spy_data.dropna(subset=['Date'])
+        
+        # Add OpenInterest column (not used but required by some Backtrader functions)
+        spy_data['OpenInterest'] = 0
+        
+        # Convert Date to string format if it's a datetime
+        if pd.api.types.is_datetime64_any_dtype(spy_data['Date']):
+            spy_data['Date'] = spy_data['Date'].dt.strftime('%Y-%m-%d')
+        
+        # Ensure we have all required columns
+        required_cols = ['Date', 'Open', 'High', 'Low', 'Close', 'Volume', 'OpenInterest']
+        missing_cols = [col for col in required_cols if col not in spy_data.columns]
+        
+        if missing_cols:
+            print(f"Error: Missing required columns: {missing_cols}")
+            return None
+        
+        # Save to CSV with proper format
+        spy_data.to_csv(filename, index=False)
+        print(f"Data saved to {filename}")
+        
+        # Verify the file is correctly formatted
+        print(f"Verifying CSV file format...")
+        with open(filename, 'r') as f:
+            first_lines = [next(f) for _ in range(min(5, len(spy_data) + 1))]
+        print(f"First few lines of {filename}:")
+        for line in first_lines:
+            print(f"  {line.strip()}")
+        
+        return filename
     
-    # Save to CSV without the index name to avoid 'Date' header
-    spy_data.to_csv(filename, date_format='%Y-%m-%d')
-    print(f"Data saved to {filename}")
-    return filename
+    except Exception as e:
+        import traceback
+        print(f"Error downloading or processing data: {e}")
+        print(traceback.format_exc())
+        return None
 
 
 def run_backtest(data_file, start_cash=10000.0, commission=0.001):

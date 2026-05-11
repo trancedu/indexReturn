@@ -46,6 +46,7 @@
       min-height: 100vh;
     }
 
+    /* ── Navbar ─────────────────────────────────────────────────── */
     .navbar-brand { font-weight: 700; font-size: 1.1rem; letter-spacing: -0.3px; }
     .navbar-dark.bg-dark { background: #010409 !important; border-bottom: 1px solid var(--border); }
 
@@ -63,6 +64,7 @@
     .badge-soxl { background: rgba(255,166,87,.15); color: var(--soxl-color); border: 1px solid rgba(255,166,87,.3); }
     .badge-tqqq { background: rgba(188,140,255,.15);color: var(--tqqq-color); border: 1px solid rgba(188,140,255,.3); }
 
+    /* ── Tabs ──────────────────────────────────────────────────── */
     .nav-tabs { border-bottom: 1px solid var(--border); gap: 2px; }
     .nav-tabs .nav-link {
       color: var(--text-muted);
@@ -81,6 +83,7 @@
       border-bottom: 2px solid var(--accent-blue);
     }
 
+    /* ── Cards ──────────────────────────────────────────────────── */
     .card {
       background: var(--bg-card);
       border: 1px solid var(--border);
@@ -99,6 +102,7 @@
     }
     .card-body { padding: 16px; }
 
+    /* ── Stat Cards ──────────────────────────────────────────────── */
     .stat-card {
       background: var(--bg-card);
       border: 1px solid var(--border);
@@ -145,6 +149,7 @@
     .val-pos { color: var(--accent-green); }
     .val-neg { color: var(--accent-red); }
 
+    /* ── Chart wrappers ──────────────────────────────────────────────── */
     .chart-container {
       position: relative;
       background: var(--bg-card);
@@ -154,6 +159,7 @@
     }
     .chart-container canvas { width: 100% !important; }
 
+    /* ── Heatmap ──────────────────────────────────────────────────── */
     .heatmap-table { width: 100%; border-collapse: separate; border-spacing: 4px; }
     .heatmap-table td {
       padding: 10px;
@@ -173,6 +179,7 @@
       text-align: center;
     }
 
+    /* ── Metric table ──────────────────────────────────────────────── */
     .metrics-table { width: 100%; }
     .metrics-table th {
       background: var(--bg-card2);
@@ -193,6 +200,7 @@
     .metrics-table tr:last-child td { border-bottom: none; }
     .metrics-table tbody tr:hover { background: rgba(255,255,255,.02); }
 
+    /* ── Beta bar ──────────────────────────────────────────────────── */
     .beta-bar-wrap { padding: 4px 0; }
     .beta-bar-bg {
       height: 8px;
@@ -207,6 +215,7 @@
       transition: width .6s cubic-bezier(.4,0,.2,1);
     }
 
+    /* ── Progress for 52w range ─────────────────────────────────────────────── */
     .range-bar { height: 6px; background: var(--border); border-radius: 3px; position: relative; }
     .range-dot {
       position: absolute;
@@ -218,12 +227,14 @@
       border: 2px solid var(--bg-card);
     }
 
+    /* ── Responsive tweaks ──────────────────────────────────────────────── */
     @media (max-width: 576px) {
       .stat-card .price { font-size: 20px; }
       .stat-card .ticker-name { font-size: 18px; }
       .nav-tabs .nav-link { padding: 8px 10px; font-size: 12px; }
     }
 
+    /* ── Loader ──────────────────────────────────────────────────── */
     .loader-wrap {
       display: flex;
       flex-direction: column;
@@ -241,6 +252,7 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    /* ── Timestamp badge ─────────────────────────────────────────────────── */
     .ts-badge {
       font-size: 11px;
       color: var(--text-muted);
@@ -250,6 +262,7 @@
       padding: 4px 10px;
     }
 
+    /* ── Legend dots ──────────────────────────────────────────────────── */
     .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
 
     .section-title {
@@ -278,6 +291,7 @@
 <body>
 <div ng-controller="DashboardCtrl" ng-cloak>
 
+  <!-- ── Navbar ─────────────────────────────────────────────────── */
   <nav class="navbar navbar-dark bg-dark sticky-top">
     <div class="container-fluid">
       <span class="navbar-brand">
@@ -292,18 +306,22 @@
     </div>
   </nav>
 
+  <!-- ── Loading state ─────────────────────────────────────────────────── */
   <div class="loader-wrap" ng-if="loading">
     <div class="spinner-ring"></div>
     <p style="color:var(--text-muted)">Loading market data…</p>
   </div>
 
+  <!-- ── Error state ──────────────────────────────────────────────────── */
   <div class="container py-5 text-center" ng-if="error">
     <i class="bi bi-exclamation-triangle-fill fs-1" style="color:var(--accent-red)"></i>
     <p class="mt-3" style="color:var(--text-muted)">{{error}}</p>
   </div>
 
+  <!-- ── Main content ──────────────────────────────────────────────────── */
   <div ng-if="!loading && !error">
 
+    <!-- Header row -->
     <div class="container-fluid px-3 pt-3 pb-2">
       <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
         <div>
@@ -312,6 +330,9 @@
         </div>
         <div class="d-flex align-items-center gap-2">
           <span class="ts-badge"><i class="bi bi-clock me-1"></i>{{data.generated_at | date:'mediumDate'}}</span>
+          <span class="ts-badge" style="color:var(--accent-green)" ng-if="lastRefresh">
+            <i class="bi bi-arrow-repeat me-1"></i>{{lastRefresh}}
+          </span>
           <span class="ts-badge" style="color:var(--accent-yellow)" ng-if="data.note">
             <i class="bi bi-info-circle me-1"></i>Simulated
           </span>
@@ -319,6 +340,7 @@
       </div>
     </div>
 
+    <!-- ── Tabs ───────────────────────────────────────────────────── */
     <div class="container-fluid px-3">
       <ul class="nav nav-tabs mb-3">
         <li class="nav-item" ng-repeat="tab in tabs">
@@ -330,7 +352,12 @@
       </ul>
     </div>
 
+    <!-- ═══════════════════════════════════════════════════════════════════════════ -->
+    <!--  TAB: OVERVIEW                                      -->
+    <!-- ═══════════════════════════════════════════════════════════════════════════ -->
     <div ng-show="activeTab==='overview'" class="container-fluid px-3">
+
+      <!-- 4-column ticker cards -->
       <div class="row g-3 mb-3">
         <div class="col-6 col-lg-3" ng-repeat="t in tickers">
           <div class="stat-card" style="border-top: 3px solid {{tickerColor(t)}}">
@@ -343,6 +370,8 @@
               </span>
             </div>
             <div class="price mb-2">${{stats[t].current_price | number:2}}</div>
+
+            <!-- 52-week range bar -->
             <div class="mb-3">
               <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px;text-align:center;letter-spacing:.3px">52-WEEK RANGE</div>
               <div class="range-bar mb-1">
@@ -353,6 +382,7 @@
                 <span style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--text-muted)">${{stats[t]['52w_high'] | number:2}}</span>
               </div>
             </div>
+
             <div class="stat-row">
               <span class="stat-label">YTD Return</span>
               <span class="stat-value" ng-class="stats[t].return_ytd >= 0 ? 'val-pos' : 'val-neg'">{{pct(stats[t].return_ytd)}}</span>
@@ -373,16 +403,27 @@
         </div>
       </div>
 
+      <!-- Quick correlation summary row -->
       <div class="card mb-3">
         <div class="card-header"><i class="bi bi-grid-3x3 me-1"></i>Correlation Quick View</div>
         <div class="card-body p-0">
           <div class="table-responsive">
             <table class="metrics-table">
-              <thead><tr><th>Pair</th><th class="text-center">Correlation</th><th>Interpretation</th></tr></thead>
+              <thead>
+                <tr>
+                  <th>Pair</th>
+                  <th class="text-center">Correlation</th>
+                  <th>Interpretation</th>
+                </tr>
+              </thead>
               <tbody>
                 <tr ng-repeat="pair in corrPairs">
                   <td><strong>{{pair.a}}</strong> vs <strong>{{pair.b}}</strong></td>
-                  <td class="text-center"><span class="stat-value" style="font-size:15px;color:{{corrColor(pair.val)}}">{{pair.val | number:3}}</span></td>
+                  <td class="text-center">
+                    <span class="stat-value" style="font-size:15px;color:{{corrColor(pair.val)}}">
+                      {{pair.val | number:3}}
+                    </span>
+                  </td>
                   <td style="color:var(--text-muted);font-size:12px">{{corrLabel(pair.val)}}</td>
                 </tr>
               </tbody>
@@ -390,28 +431,52 @@
           </div>
         </div>
       </div>
-    </div>
 
+    </div><!-- /overview -->
+
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════ -->
+    <!--  TAB: RETURNS                                       -->
+    <!-- ═══════════════════════════════════════════════════════════════════════════ -->
     <div ng-show="activeTab==='returns'" class="container-fluid px-3">
+      <!-- Legend -->
       <div class="d-flex flex-wrap gap-3 mb-3">
         <span ng-repeat="t in tickers" class="d-flex align-items-center gap-1" style="font-size:13px">
           <span class="legend-dot" style="background:{{tickerColor(t)}}"></span>
           <span style="font-weight:600;color:{{tickerColor(t)}}">{{t}}</span>
         </span>
       </div>
+
+      <!-- Normalized price chart -->
       <div class="chart-container mb-3">
         <div class="section-title mb-2">1-Year Normalized Price (Base = 100)</div>
         <canvas id="priceChart" style="max-height:320px"></canvas>
       </div>
+
+      <!-- Returns comparison table -->
       <div class="card">
         <div class="card-header"><i class="bi bi-table me-1"></i>Returns Summary</div>
         <div class="card-body p-0">
           <div class="table-responsive">
             <table class="metrics-table">
-              <thead><tr><th>Ticker</th><th class="text-end">Current Price</th><th class="text-end">Day Chg</th><th class="text-end">YTD</th><th class="text-end">1M</th><th class="text-end">3M</th><th class="text-end">6M</th><th class="text-end">1Y Ann.</th></tr></thead>
+              <thead>
+                <tr>
+                  <th>Ticker</th>
+                  <th class="text-end">Current Price</th>
+                  <th class="text-end">Day Chg</th>
+                  <th class="text-end">YTD</th>
+                  <th class="text-end">1M</th>
+                  <th class="text-end">3M</th>
+                  <th class="text-end">6M</th>
+                  <th class="text-end">1Y Ann.</th>
+                </tr>
+              </thead>
               <tbody>
                 <tr ng-repeat="t in tickers">
-                  <td><span class="legend-dot me-1" style="background:{{tickerColor(t)}}"></span><strong style="color:{{tickerColor(t)}}">{{t}}</strong></td>
+                  <td>
+                    <span class="legend-dot me-1" style="background:{{tickerColor(t)}}"></span>
+                    <strong style="color:{{tickerColor(t)}}">{{t}}</strong>
+                  </td>
                   <td class="text-end" style="font-family:JetBrains Mono,monospace">${{stats[t].current_price | number:2}}</td>
                   <td class="text-end" ng-class="stats[t].day_change_pct >= 0 ? 'val-pos' : 'val-neg'">{{pct(stats[t].day_change_pct,2)}}</td>
                   <td class="text-end" ng-class="stats[t].return_ytd >= 0 ? 'val-pos' : 'val-neg'">{{pct(stats[t].return_ytd)}}</td>
@@ -425,23 +490,38 @@
           </div>
         </div>
       </div>
-    </div>
+    </div><!-- /returns -->
 
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════ -->
+    <!--  TAB: CORRELATION                                   -->
+    <!-- ═══════════════════════════════════════════════════════════════════════════ -->
     <div ng-show="activeTab==='correlation'" class="container-fluid px-3">
+
+      <!-- Heatmap -->
       <div class="card mb-3">
         <div class="card-header"><i class="bi bi-grid-fill me-1"></i>Correlation Matrix (Daily Returns)</div>
         <div class="card-body">
           <div class="table-responsive">
             <table class="heatmap-table">
-              <thead><tr><th></th><th ng-repeat="t in tickers">{{t}}</th></tr></thead>
+              <thead>
+                <tr>
+                  <th></th>
+                  <th ng-repeat="t in tickers">{{t}}</th>
+                </tr>
+              </thead>
               <tbody>
                 <tr ng-repeat="row in tickers; track by $index">
                   <th style="text-align:right;padding-right:8px;font-size:12px;color:var(--text-muted)">{{row}}</th>
-                  <td ng-repeat="col in tickers; track by $index" style="background:{{heatBg($index,$parent.$index)}};color:{{heatFg($index,$parent.$index)}}">{{corrMatrix[$parent.$index][$index] | number:3}}</td>
+                  <td ng-repeat="col in tickers; track by $index"
+                      style="background:{{heatBg($index,$parent.$index)}};color:{{heatFg($index,$parent.$index)}}">
+                    {{corrMatrix[$parent.$index][$index] | number:3}}
+                  </td>
                 </tr>
               </tbody>
             </table>
           </div>
+          <!-- Color scale legend -->
           <div class="d-flex align-items-center gap-2 mt-3">
             <span style="font-size:11px;color:var(--text-muted)">-1.0</span>
             <div style="height:8px;flex:1;border-radius:4px;background:linear-gradient(to right,#f85149,#30363d,#3fb950)"></div>
@@ -449,10 +529,14 @@
           </div>
         </div>
       </div>
+
+      <!-- Rolling correlation chart -->
       <div class="chart-container mb-3">
         <div class="section-title mb-2">Rolling 30-Day Correlation vs QQQ</div>
         <canvas id="rollingCorrChart" style="max-height:280px"></canvas>
       </div>
+
+      <!-- Interpretation card -->
       <div class="card">
         <div class="card-header"><i class="bi bi-lightbulb me-1"></i>Insights</div>
         <div class="card-body">
@@ -466,96 +550,175 @@
           </div>
         </div>
       </div>
-    </div>
+    </div><!-- /correlation -->
 
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════ -->
+    <!--  TAB: BETA                                          -->
+    <!-- ═══════════════════════════════════════════════════════════════════════════ -->
     <div ng-show="activeTab==='beta'" class="container-fluid px-3">
+
+      <!-- Beta chart -->
       <div class="chart-container mb-3">
         <div class="section-title mb-2">Beta vs SPY &amp; QQQ</div>
         <canvas id="betaChart" style="max-height:300px"></canvas>
       </div>
+
+      <!-- Beta cards -->
       <div class="row g-3 mb-3">
         <div class="col-6 col-lg-3" ng-repeat="t in tickers">
           <div class="stat-card" style="border-left: 3px solid {{tickerColor(t)}}">
             <div class="mb-1" style="font-weight:700;font-size:15px;color:{{tickerColor(t)}}">{{t}}</div>
+
             <div class="section-title mt-2">Beta vs SPY</div>
-            <div style="font-family:JetBrains Mono,monospace;font-size:22px;font-weight:600;color:{{betaColor(stats[t].beta_vs_spy)}}">{{stats[t].beta_vs_spy | number:2}}</div>
-            <div class="beta-bar-wrap"><div class="beta-bar-bg"><div class="beta-bar-fill" style="width:{{betaBarPct(stats[t].beta_vs_spy)}}%;background:{{betaColor(stats[t].beta_vs_spy)}}"></div></div></div>
+            <div style="font-family:JetBrains Mono,monospace;font-size:22px;font-weight:600;color:{{betaColor(stats[t].beta_vs_spy)}}">
+              {{stats[t].beta_vs_spy | number:2}}
+            </div>
+            <div class="beta-bar-wrap">
+              <div class="beta-bar-bg">
+                <div class="beta-bar-fill" style="width:{{betaBarPct(stats[t].beta_vs_spy)}}%;background:{{betaColor(stats[t].beta_vs_spy)}}"></div>
+              </div>
+            </div>
+
             <div class="section-title mt-3">Beta vs QQQ</div>
-            <div style="font-family:JetBrains Mono,monospace;font-size:22px;font-weight:600;color:{{betaColor(stats[t].beta_vs_qqq)}}">{{stats[t].beta_vs_qqq | number:2}}</div>
-            <div class="beta-bar-wrap"><div class="beta-bar-bg"><div class="beta-bar-fill" style="width:{{betaBarPct(stats[t].beta_vs_qqq)}}%;background:{{betaColor(stats[t].beta_vs_qqq)}}"></div></div></div>
+            <div style="font-family:JetBrains Mono,monospace;font-size:22px;font-weight:600;color:{{betaColor(stats[t].beta_vs_qqq)}}">
+              {{stats[t].beta_vs_qqq | number:2}}
+            </div>
+            <div class="beta-bar-wrap">
+              <div class="beta-bar-bg">
+                <div class="beta-bar-fill" style="width:{{betaBarPct(stats[t].beta_vs_qqq)}}%;background:{{betaColor(stats[t].beta_vs_qqq)}}"></div>
+              </div>
+            </div>
+
             <div class="mt-2" style="font-size:11px;color:var(--text-muted)">{{betaInterpret(t)}}</div>
           </div>
         </div>
       </div>
+
+      <!-- Beta explanation -->
       <div class="card">
         <div class="card-header"><i class="bi bi-info-circle me-1"></i>Understanding Beta</div>
         <div class="card-body">
           <div class="row g-3">
-            <div class="col-12 col-md-4"><div style="background:var(--bg-card2);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center"><div style="font-size:28px;font-weight:700;color:var(--accent-blue)">&beta; &lt; 1</div><div style="font-size:12px;color:var(--text-muted);margin-top:4px">Less volatile than the market. Defensive play.</div></div></div>
-            <div class="col-12 col-md-4"><div style="background:var(--bg-card2);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center"><div style="font-size:28px;font-weight:700;color:var(--accent-yellow)">&beta; = 1</div><div style="font-size:12px;color:var(--text-muted);margin-top:4px">Moves in line with the market.</div></div></div>
-            <div class="col-12 col-md-4"><div style="background:var(--bg-card2);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center"><div style="font-size:28px;font-weight:700;color:var(--accent-red)">&beta; &gt; 1</div><div style="font-size:12px;color:var(--text-muted);margin-top:4px">Amplifies market moves. Higher risk &amp; reward.</div></div></div>
+            <div class="col-12 col-md-4">
+              <div style="background:var(--bg-card2);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center">
+                <div style="font-size:28px;font-weight:700;color:var(--accent-blue)">β &lt; 1</div>
+                <div style="font-size:12px;color:var(--text-muted);margin-top:4px">Less volatile than the market. Defensive play.</div>
+              </div>
+            </div>
+            <div class="col-12 col-md-4">
+              <div style="background:var(--bg-card2);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center">
+                <div style="font-size:28px;font-weight:700;color:var(--accent-yellow)">β = 1</div>
+                <div style="font-size:12px;color:var(--text-muted);margin-top:4px">Moves in line with the market.</div>
+              </div>
+            </div>
+            <div class="col-12 col-md-4">
+              <div style="background:var(--bg-card2);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center">
+                <div style="font-size:28px;font-weight:700;color:var(--accent-red)">β &gt; 1</div>
+                <div style="font-size:12px;color:var(--text-muted);margin-top:4px">Amplifies market moves. Higher risk &amp; reward.</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </div><!-- /beta -->
 
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════ -->
+    <!--  TAB: RISK                                          -->
+    <!-- ═══════════════════════════════════════════════════════════════════════════ -->
     <div ng-show="activeTab==='risk'" class="container-fluid px-3">
+
+      <!-- Risk radar chart -->
       <div class="chart-container mb-3">
         <div class="section-title mb-2">Risk Profile Comparison</div>
         <canvas id="riskRadarChart" style="max-height:350px"></canvas>
       </div>
+
+      <!-- Volatility regimes -->
       <div class="chart-container mb-3">
         <div class="section-title mb-2">Monthly Realized Volatility (Annualized)</div>
         <canvas id="volChart" style="max-height:250px"></canvas>
       </div>
+
+      <!-- Full metrics table -->
       <div class="card">
         <div class="card-header"><i class="bi bi-table me-1"></i>Full Risk Metrics</div>
         <div class="card-body p-0">
           <div class="table-responsive">
             <table class="metrics-table">
-              <thead><tr><th>Metric</th><th class="text-end" ng-repeat="t in tickers" style="color:{{tickerColor(t)}}">{{t}}</th></tr></thead>
+              <thead>
+                <tr>
+                  <th>Metric</th>
+                  <th class="text-end" ng-repeat="t in tickers" style="color:{{tickerColor(t)}}">{{t}}</th>
+                </tr>
+              </thead>
               <tbody>
                 <tr ng-repeat="row in riskRows">
                   <td style="font-weight:500">{{row.label}}</td>
-                  <td class="text-end" ng-repeat="t in tickers" style="font-family:JetBrains Mono,monospace" ng-class="row.colorFn && row.colorFn(stats[t][row.key]) === 'pos' ? 'val-pos' : (row.colorFn && row.colorFn(stats[t][row.key]) === 'neg' ? 'val-neg' : '')">{{row.fmt(stats[t][row.key])}}</td>
+                  <td class="text-end" ng-repeat="t in tickers"
+                      style="font-family:JetBrains Mono,monospace"
+                      ng-class="row.colorFn && row.colorFn(stats[t][row.key]) === 'pos' ? 'val-pos' : (row.colorFn && row.colorFn(stats[t][row.key]) === 'neg' ? 'val-neg' : '')">
+                    {{row.fmt(stats[t][row.key])}}
+                  </td>
                 </tr>
               </tbody>
             </table>
           </div>
         </div>
       </div>
-    </div>
+    </div><!-- /risk -->
 
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════ -->
+    <!--  TAB: DETAILS                                       -->
+    <!-- ═══════════════════════════════════════════════════════════════════════════ -->
     <div ng-show="activeTab==='details'" class="container-fluid px-3">
       <div class="card">
         <div class="card-header"><i class="bi bi-file-earmark-text me-1"></i>Complete Statistics</div>
         <div class="card-body p-0">
           <div class="table-responsive">
             <table class="metrics-table">
-              <thead><tr><th>Statistic</th><th class="text-end" ng-repeat="t in tickers" style="color:{{tickerColor(t)}}">{{t}}</th></tr></thead>
+              <thead>
+                <tr>
+                  <th>Statistic</th>
+                  <th class="text-end" ng-repeat="t in tickers" style="color:{{tickerColor(t)}}">{{t}}</th>
+                </tr>
+              </thead>
               <tbody>
                 <tr ng-repeat="row in allRows">
-                  <td><span style="font-weight:500">{{row.label}}</span><span ng-if="row.hint" style="display:block;font-size:11px;color:var(--text-muted)">{{row.hint}}</span></td>
-                  <td class="text-end" ng-repeat="t in tickers" style="font-family:JetBrains Mono,monospace;font-size:13px" ng-class="row.colorFn && row.colorFn(stats[t][row.key]) === 'pos' ? 'val-pos' : (row.colorFn && row.colorFn(stats[t][row.key]) === 'neg' ? 'val-neg' : '')">{{row.fmt(stats[t][row.key])}}</td>
+                  <td>
+                    <span style="font-weight:500">{{row.label}}</span>
+                    <span ng-if="row.hint" style="display:block;font-size:11px;color:var(--text-muted)">{{row.hint}}</span>
+                  </td>
+                  <td class="text-end" ng-repeat="t in tickers"
+                      style="font-family:JetBrains Mono,monospace;font-size:13px"
+                      ng-class="row.colorFn && row.colorFn(stats[t][row.key]) === 'pos' ? 'val-pos' : (row.colorFn && row.colorFn(stats[t][row.key]) === 'neg' ? 'val-neg' : '')">
+                    {{row.fmt(stats[t][row.key])}}
+                  </td>
                 </tr>
               </tbody>
             </table>
           </div>
         </div>
       </div>
-    </div>
+    </div><!-- /details -->
 
+    <!-- Footer -->
     <div class="container-fluid px-3 py-4 mt-2" style="border-top:1px solid var(--border)">
       <p style="color:var(--text-muted);font-size:11px;margin:0;text-align:center">
-        Data generated by <strong>fetch_stats.py</strong> &middot; Powered by Python UV + AngularJS + Chart.js &middot;
+        Data generated by <strong>fetch_stats.py</strong> · Powered by Python UV + AngularJS + Chart.js ·
         <span ng-if="data.note" style="color:var(--accent-yellow)">{{data.note}}</span>
       </p>
     </div>
 
-  </div>
-</div>
+  </div><!-- /main content -->
+</div><!-- /ng-controller -->
 
 <script>
+// ═══════════════════════════════════════════════════════════════════════════
+//  AngularJS App
+// ═══════════════════════════════════════════════════════════════════════════
 angular.module('stockDashboard', [])
 
 .filter('date', function() {
@@ -568,6 +731,7 @@ angular.module('stockDashboard', [])
 
 .controller('DashboardCtrl', ['$scope', '$http', '$timeout', function($scope, $http, $timeout) {
 
+  // ── State ────────────────────────────────────────────────────────────────────────
   $scope.loading   = true;
   $scope.error     = null;
   $scope.data      = null;
@@ -582,9 +746,11 @@ angular.module('stockDashboard', [])
     { id: 'details',      label: 'All Stats',    icon: 'table' },
   ];
 
+  // ── Ticker colors ──────────────────────────────────────────────────────────────────────
   var COLORS = { SOXX: '#58a6ff', QQQ: '#3fb950', SOXL: '#ffa657', TQQQ: '#bc8cff' };
   $scope.tickerColor = function(t) { return COLORS[t] || '#8b949e'; };
 
+  // ── Helpers ──────────────────────────────────────────────────────────────────────
   $scope.pct = function(v, dec) {
     if (v === null || v === undefined) return '–';
     dec = dec || 1;
@@ -604,6 +770,7 @@ angular.module('stockDashboard', [])
     return Math.max(2, Math.min(98, ((s.current_price - s['52w_low']) / range) * 100));
   };
 
+  // Correlation helpers
   $scope.corrColor = function(v) {
     if (v >= 0.9) return '#3fb950';
     if (v >= 0.7) return '#58a6ff';
@@ -618,26 +785,34 @@ angular.module('stockDashboard', [])
     return 'Very low – diversified';
   };
 
+  // Heatmap background gradient: red → grey → green
   function lerp(a, b, t) { return a + (b - a) * t; }
   $scope.heatBg = function(ci, ri) {
     if (!$scope.corrMatrix) return 'transparent';
-    var v = $scope.corrMatrix[ri][ci];
-    var t = (v + 1) / 2;
+    var v = $scope.corrMatrix[ri][ci]; // -1 to 1
+    var t = (v + 1) / 2;             // 0 to 1
+    // red: [248,81,73], grey: [48,54,61], green: [63,185,80]
     var r, g, b;
     if (t < 0.5) {
       var u = t * 2;
-      r = Math.round(lerp(248, 48, u)); g = Math.round(lerp(81, 54, u)); b = Math.round(lerp(73, 61, u));
+      r = Math.round(lerp(248, 48, u));
+      g = Math.round(lerp(81, 54, u));
+      b = Math.round(lerp(73, 61, u));
     } else {
       var u = (t - 0.5) * 2;
-      r = Math.round(lerp(48, 63, u)); g = Math.round(lerp(54, 185, u)); b = Math.round(lerp(61, 80, u));
+      r = Math.round(lerp(48, 63, u));
+      g = Math.round(lerp(54, 185, u));
+      b = Math.round(lerp(61, 80, u));
     }
     return 'rgba(' + r + ',' + g + ',' + b + ',0.8)';
   };
   $scope.heatFg = function(ci, ri) {
     if (!$scope.corrMatrix) return '#fff';
-    return $scope.corrMatrix[ri][ci] > 0.5 || $scope.corrMatrix[ri][ci] < -0.2 ? '#ffffff' : '#e6edf3';
+    return $scope.corrMatrix[ri][ci] > 0.5 || $scope.corrMatrix[ri][ci] < -0.2
+      ? '#ffffff' : '#e6edf3';
   };
 
+  // Beta helpers
   $scope.betaColor = function(v) {
     if (!v) return '#8b949e';
     if (v > 2.5) return '#f85149';
@@ -645,7 +820,10 @@ angular.module('stockDashboard', [])
     if (v > 1.0) return '#d29922';
     return '#3fb950';
   };
-  $scope.betaBarPct = function(v) { if (!v) return 0; return Math.min(100, (v / 5) * 100); };
+  $scope.betaBarPct = function(v) {
+    if (!v) return 0;
+    return Math.min(100, (v / 5) * 100);
+  };
   $scope.betaInterpret = function(t) {
     var b = $scope.stats[t].beta_vs_spy;
     if (!b) return '';
@@ -656,14 +834,17 @@ angular.module('stockDashboard', [])
     return 'Defensive – less volatile than the market';
   };
 
+  // ── Risk table rows ───────────────────────────────────────────────────────────────────────
   function pctFmt(v) { return v !== null && v !== undefined ? (v*100).toFixed(1)+'%' : '–'; }
   function numFmt(v, d) { return v !== null && v !== undefined ? (+v).toFixed(d||2) : '–'; }
   function dolFmt(v) { return v !== null && v !== undefined ? '$'+(+v).toFixed(2) : '–'; }
 
   $scope.riskRows = [
-    { key: 'ann_volatility', label: 'Ann. Volatility',  fmt: pctFmt },
-    { key: 'sharpe_ratio',   label: 'Sharpe Ratio',     fmt: function(v) { return numFmt(v,2); }, colorFn: function(v) { return v >= 1 ? 'pos' : v < 0 ? 'neg' : ''; } },
-    { key: 'max_drawdown',   label: 'Max Drawdown',     fmt: pctFmt, colorFn: function(v) { return v < 0 ? 'neg' : 'pos'; } },
+    { key: 'ann_volatility', label: 'Ann. Volatility',  fmt: pctFmt, hint: 'Annualized std-dev of daily returns (×√252)' },
+    { key: 'sharpe_ratio',   label: 'Sharpe Ratio',     fmt: function(v) { return numFmt(v,2); },
+      colorFn: function(v) { return v >= 1 ? 'pos' : v < 0 ? 'neg' : ''; } },
+    { key: 'max_drawdown',   label: 'Max Drawdown',     fmt: pctFmt,
+      colorFn: function(v) { return v < 0 ? 'neg' : 'pos'; } },
     { key: 'beta_vs_spy',    label: 'Beta vs SPY',      fmt: function(v) { return numFmt(v,2); } },
     { key: 'beta_vs_qqq',    label: 'Beta vs QQQ',      fmt: function(v) { return numFmt(v,2); } },
   ];
@@ -671,64 +852,142 @@ angular.module('stockDashboard', [])
   $scope.allRows = [
     { key: 'current_price',  label: 'Current Price',   fmt: dolFmt },
     { key: 'prev_close',     label: 'Prev Close',      fmt: dolFmt },
-    { key: 'day_change_pct', label: 'Day Change',      fmt: pctFmt, colorFn: function(v) { return v >= 0 ? 'pos' : 'neg'; } },
+    { key: 'day_change_pct', label: 'Day Change',      fmt: pctFmt,
+      colorFn: function(v) { return v >= 0 ? 'pos' : 'neg'; } },
     { key: '52w_high',       label: '52-Week High',    fmt: dolFmt },
     { key: '52w_low',        label: '52-Week Low',     fmt: dolFmt },
-    { key: 'return_ytd',     label: 'YTD Return',      fmt: pctFmt, colorFn: function(v) { return v >= 0 ? 'pos' : 'neg'; } },
-    { key: 'return_1m',      label: '1-Month Return',  fmt: pctFmt, colorFn: function(v) { return v >= 0 ? 'pos' : 'neg'; } },
-    { key: 'return_3m',      label: '3-Month Return',  fmt: pctFmt, colorFn: function(v) { return v >= 0 ? 'pos' : 'neg'; } },
-    { key: 'return_6m',      label: '6-Month Return',  fmt: pctFmt, colorFn: function(v) { return v >= 0 ? 'pos' : 'neg'; } },
-    { key: 'ann_return_1y',  label: '1Y Ann. Return',  fmt: pctFmt, colorFn: function(v) { return v >= 0 ? 'pos' : 'neg'; } },
+    { key: 'return_ytd',     label: 'YTD Return',      fmt: pctFmt,
+      colorFn: function(v) { return v >= 0 ? 'pos' : 'neg'; } },
+    { key: 'return_1m',      label: '1-Month Return',  fmt: pctFmt,
+      colorFn: function(v) { return v >= 0 ? 'pos' : 'neg'; } },
+    { key: 'return_3m',      label: '3-Month Return',  fmt: pctFmt,
+      colorFn: function(v) { return v >= 0 ? 'pos' : 'neg'; } },
+    { key: 'return_6m',      label: '6-Month Return',  fmt: pctFmt,
+      colorFn: function(v) { return v >= 0 ? 'pos' : 'neg'; } },
+    { key: 'ann_return_1y',  label: '1Y Ann. Return',  fmt: pctFmt,
+      colorFn: function(v) { return v >= 0 ? 'pos' : 'neg'; } },
     { key: 'ann_volatility', label: 'Ann. Volatility', fmt: pctFmt },
-    { key: 'sharpe_ratio',   label: 'Sharpe Ratio',    fmt: function(v){ return numFmt(v,2); }, hint: '(Ret - 5% RF) / Volatility', colorFn: function(v) { return v >= 1 ? 'pos' : v < 0 ? 'neg' : ''; } },
-    { key: 'max_drawdown',   label: 'Max Drawdown',    fmt: pctFmt, hint: 'Worst peak-to-trough decline', colorFn: function(v) { return v < 0 ? 'neg' : 'pos'; } },
+    { key: 'sharpe_ratio',   label: 'Sharpe Ratio',    fmt: function(v){ return numFmt(v,2); },
+      hint: '(Ret - 5% RF) / Volatility',
+      colorFn: function(v) { return v >= 1 ? 'pos' : v < 0 ? 'neg' : ''; } },
+    { key: 'max_drawdown',   label: 'Max Drawdown',    fmt: pctFmt,
+      hint: 'Worst peak-to-trough decline',
+      colorFn: function(v) { return v < 0 ? 'neg' : 'pos'; } },
     { key: 'beta_vs_spy',    label: 'Beta vs SPY',     fmt: function(v){ return numFmt(v,2); } },
     { key: 'beta_vs_qqq',    label: 'Beta vs QQQ',     fmt: function(v){ return numFmt(v,2); } },
   ];
 
+  // ── Chart instances (keyed by canvas id) ─────────────────────────────────────────────────
   var charts = {};
-  function destroyChart(id) { if (charts[id]) { charts[id].destroy(); delete charts[id]; } }
+
+  function destroyChart(id) {
+    if (charts[id]) { charts[id].destroy(); delete charts[id]; }
+  }
 
   function drawCharts(tab) {
     var d = $scope.data;
     if (!d) return;
-    var baseDatasetOpts = { borderWidth: 2, pointRadius: 0, tension: 0.3 };
-    var darkGridColor = 'rgba(48,54,61,0.6)';
-    var tickColor = '#8b949e';
 
+    var baseDatasetOpts = {
+      borderWidth: 2,
+      pointRadius: 0,
+      tension: 0.3,
+    };
+
+    var darkGridColor   = 'rgba(48,54,61,0.6)';
+    var tickColor       = '#8b949e';
+
+    // ── Price chart ──────────────────────────────────────────────────────────────────
     if (tab === 'returns') {
       destroyChart('priceChart');
       var pc = document.getElementById('priceChart');
       if (!pc) return;
       var pd = d.price_chart;
+      var labels = pd.dates;
       var datasets = Object.keys(pd.series).map(function(t) {
-        return Object.assign({}, baseDatasetOpts, { label: t, data: pd.series[t], borderColor: COLORS[t], fill: false });
+        return Object.assign({}, baseDatasetOpts, {
+          label: t,
+          data:  pd.series[t],
+          borderColor: COLORS[t],
+          backgroundColor: COLORS[t].replace(')', ',0.07)').replace('rgb', 'rgba'),
+          fill: false,
+        });
       });
       charts['priceChart'] = new Chart(pc, {
-        type: 'line', data: { labels: pd.dates, datasets: datasets },
-        options: { responsive: true, interaction: { mode: 'index', intersect: false },
-          plugins: { legend: { labels: { color: tickColor } }, tooltip: { backgroundColor: '#1c2128', borderColor: '#30363d', borderWidth: 1, titleColor: '#e6edf3', bodyColor: '#8b949e' } },
-          scales: { x: { ticks: { color: tickColor, maxRotation: 0, maxTicksLimit: 8 }, grid: { color: darkGridColor } }, y: { ticks: { color: tickColor, callback: function(v) { return v.toFixed(0); } }, grid: { color: darkGridColor } } } }
+        type: 'line',
+        data: { labels: labels, datasets: datasets },
+        options: {
+          responsive: true,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { labels: { color: tickColor, font: { family: 'Inter' } } },
+            tooltip: {
+              backgroundColor: '#1c2128',
+              borderColor: '#30363d',
+              borderWidth: 1,
+              titleColor: '#e6edf3',
+              bodyColor: '#8b949e',
+              callbacks: {
+                label: function(ctx) {
+                  return ' ' + ctx.dataset.label + ': ' + (ctx.parsed.y).toFixed(1);
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              ticks: { color: tickColor, maxRotation: 0, maxTicksLimit: 8, font: { family: 'JetBrains Mono', size: 11 } },
+              grid:  { color: darkGridColor }
+            },
+            y: {
+              ticks: { color: tickColor, font: { family: 'JetBrains Mono', size: 11 },
+                       callback: function(v) { return v.toFixed(0); }},
+              grid:  { color: darkGridColor }
+            }
+          }
+        }
       });
     }
 
+    // ── Rolling correlation chart ───────────────────────────────────────────────────────────────
     if (tab === 'correlation') {
       destroyChart('rollingCorrChart');
       var rc = document.getElementById('rollingCorrChart');
       if (!rc) return;
       var rcd = d.rolling_correlation_vs_qqq;
       var rcTickers = Object.keys(rcd);
+      var rcLabels = rcd[rcTickers[0]].dates;
       var rcDatasets = rcTickers.map(function(t) {
-        return Object.assign({}, baseDatasetOpts, { label: t + ' / QQQ', data: rcd[t].values, borderColor: COLORS[t], fill: false });
+        return Object.assign({}, baseDatasetOpts, {
+          label: t + ' / QQQ',
+          data:  rcd[t].values,
+          borderColor: COLORS[t],
+          fill: false,
+        });
       });
       charts['rollingCorrChart'] = new Chart(rc, {
-        type: 'line', data: { labels: rcd[rcTickers[0]].dates, datasets: rcDatasets },
-        options: { responsive: true, interaction: { mode: 'index', intersect: false },
-          plugins: { legend: { labels: { color: tickColor } }, tooltip: { backgroundColor: '#1c2128', borderColor: '#30363d', borderWidth: 1, titleColor: '#e6edf3', bodyColor: '#8b949e' } },
-          scales: { x: { ticks: { color: tickColor, maxRotation: 0, maxTicksLimit: 8 }, grid: { color: darkGridColor } }, y: { min: -0.1, max: 1.05, ticks: { color: tickColor, callback: function(v) { return v.toFixed(2); } }, grid: { color: darkGridColor } } } }
+        type: 'line',
+        data: { labels: rcLabels, datasets: rcDatasets },
+        options: {
+          responsive: true,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { labels: { color: tickColor } },
+            tooltip: {
+              backgroundColor: '#1c2128', borderColor: '#30363d', borderWidth: 1,
+              titleColor: '#e6edf3', bodyColor: '#8b949e',
+              callbacks: { label: function(ctx) { return ' ' + ctx.dataset.label + ': ' + ctx.parsed.y.toFixed(3); }}
+            }
+          },
+          scales: {
+            x: { ticks: { color: tickColor, maxRotation: 0, maxTicksLimit: 8, font: { size: 11 } }, grid: { color: darkGridColor }},
+            y: { min: -0.1, max: 1.05, ticks: { color: tickColor, font: { size: 11 }, callback: function(v) { return v.toFixed(2); }}, grid: { color: darkGridColor }}
+          }
+        }
       });
     }
 
+    // ── Beta grouped bar chart ───────────────────────────────────────────────────────────────
     if (tab === 'beta') {
       destroyChart('betaChart');
       var bc = document.getElementById('betaChart');
@@ -736,76 +995,173 @@ angular.module('stockDashboard', [])
       var tks = d.tickers;
       charts['betaChart'] = new Chart(bc, {
         type: 'bar',
-        data: { labels: tks, datasets: [
-          { label: 'Beta vs SPY', data: tks.map(function(t){ return d.stats[t].beta_vs_spy; }), backgroundColor: tks.map(function(t){ return COLORS[t]+'99'; }), borderColor: tks.map(function(t){ return COLORS[t]; }), borderWidth: 2, borderRadius: 4 },
-          { label: 'Beta vs QQQ', data: tks.map(function(t){ return d.stats[t].beta_vs_qqq; }), backgroundColor: tks.map(function(t){ return COLORS[t]+'44'; }), borderColor: tks.map(function(t){ return COLORS[t]; }), borderWidth: 2, borderRadius: 4 }
-        ]},
-        options: { responsive: true, plugins: { legend: { labels: { color: tickColor } }, tooltip: { backgroundColor: '#1c2128', borderColor: '#30363d', borderWidth: 1, titleColor: '#e6edf3', bodyColor: '#8b949e' } },
-          scales: { x: { ticks: { color: tickColor }, grid: { color: darkGridColor } }, y: { ticks: { color: tickColor, callback: function(v){ return v.toFixed(1)+'x'; } }, grid: { color: darkGridColor } } } }
+        data: {
+          labels: tks,
+          datasets: [
+            {
+              label: 'Beta vs SPY',
+              data: tks.map(function(t) { return d.stats[t].beta_vs_spy; }),
+              backgroundColor: tks.map(function(t) { return COLORS[t] + '99'; }),
+              borderColor:     tks.map(function(t) { return COLORS[t]; }),
+              borderWidth: 2,
+              borderRadius: 4,
+            },
+            {
+              label: 'Beta vs QQQ',
+              data: tks.map(function(t) { return d.stats[t].beta_vs_qqq; }),
+              backgroundColor: tks.map(function(t) { return COLORS[t] + '44'; }),
+              borderColor:     tks.map(function(t) { return COLORS[t]; }),
+              borderWidth: 2,
+              borderDash: [5, 5],
+              borderRadius: 4,
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { labels: { color: tickColor } },
+            tooltip: { backgroundColor: '#1c2128', borderColor: '#30363d', borderWidth: 1,
+                       titleColor: '#e6edf3', bodyColor: '#8b949e',
+                       callbacks: { label: function(ctx) { return ' ' + ctx.dataset.label + ': ' + ctx.parsed.y.toFixed(2); }}}
+          },
+          scales: {
+            x: { ticks: { color: tickColor, font: { family: 'Inter', weight: '600' }}, grid: { color: darkGridColor }},
+            y: { ticks: { color: tickColor, font: { size: 11 }, callback: function(v) { return v.toFixed(1) + 'x'; }},
+                 grid: { color: darkGridColor }}
+          }
+        }
       });
     }
 
+    // ── Risk radar chart ──────────────────────────────────────────────────────────────────────
     if (tab === 'risk') {
       destroyChart('riskRadarChart');
       var rr = document.getElementById('riskRadarChart');
       if (!rr) return;
       var tks = d.tickers;
+
+      // Normalize each metric to 0-100 scale for radar
       var maxVol = Math.max.apply(null, tks.map(function(t){ return d.stats[t].ann_volatility || 0; }));
       var maxDD  = Math.max.apply(null, tks.map(function(t){ return Math.abs(d.stats[t].max_drawdown) || 0; }));
       var maxB   = Math.max.apply(null, tks.map(function(t){ return d.stats[t].beta_vs_spy || 0; }));
+
+      var radarLabels   = ['Ann. Volatility', 'Max Drawdown', 'Beta (SPY)', 'Sharpe ×10', '1Y Return'];
+      var radarDatasets = tks.map(function(t, i) {
+        var s = d.stats[t];
+        return {
+          label: t,
+          data: [
+            maxVol > 0  ? (s.ann_volatility / maxVol) * 100  : 0,
+            maxDD  > 0  ? (Math.abs(s.max_drawdown) / maxDD) * 100 : 0,
+            maxB   > 0  ? (s.beta_vs_spy / maxB) * 100       : 0,
+            Math.max(0, (s.sharpe_ratio + 2) / 3 * 100),     // shift sharpe
+            Math.max(0, (s.ann_return_1y + 0.5) / 1.0 * 100),
+          ],
+          borderColor: COLORS[t],
+          backgroundColor: COLORS[t] + '22',
+          pointBackgroundColor: COLORS[t],
+          borderWidth: 2,
+          pointRadius: 3,
+        };
+      });
       charts['riskRadarChart'] = new Chart(rr, {
         type: 'radar',
-        data: { labels: ['Ann. Volatility','Max Drawdown','Beta (SPY)','Sharpe ×10','1Y Return'],
-          datasets: tks.map(function(t) {
-            var s = d.stats[t];
-            return { label: t, data: [maxVol>0?(s.ann_volatility/maxVol)*100:0, maxDD>0?(Math.abs(s.max_drawdown)/maxDD)*100:0, maxB>0?(s.beta_vs_spy/maxB)*100:0, Math.max(0,(s.sharpe_ratio+2)/3*100), Math.max(0,(s.ann_return_1y+0.5)/1.0*100)],
-              borderColor: COLORS[t], backgroundColor: COLORS[t]+'22', pointBackgroundColor: COLORS[t], borderWidth: 2, pointRadius: 3 };
-          })},
-        options: { responsive: true, plugins: { legend: { labels: { color: tickColor } } },
-          scales: { r: { ticks: { display: false, backdropColor: 'transparent' }, grid: { color: darkGridColor }, pointLabels: { color: tickColor }, angleLines: { color: darkGridColor } } } }
+        data: { labels: radarLabels, datasets: radarDatasets },
+        options: {
+          responsive: true,
+          plugins: { legend: { labels: { color: tickColor }}},
+          scales: {
+            r: {
+              ticks: { display: false, backdropColor: 'transparent' },
+              grid:  { color: darkGridColor },
+              pointLabels: { color: tickColor, font: { family: 'Inter', size: 11 }},
+              angleLines: { color: darkGridColor }
+            }
+          }
+        }
       });
 
+      // ── Volatility regime chart ────────────────────────────────────────────────────────────────
       destroyChart('volChart');
       var vc = document.getElementById('volChart');
       if (!vc || !d.vol_regimes) return;
       var volData = d.vol_regimes;
+      var volLabels = volData[tks[0]].dates;
       var volDatasets = tks.map(function(t) {
-        return { label: t, data: volData[t].vols.map(function(v){ return v!==null?(v*100).toFixed(2):null; }), borderColor: COLORS[t], borderWidth: 2, fill: false, tension: 0.3, pointRadius: 0 };
+        return {
+          label: t,
+          data: volData[t].vols.map(function(v) { return v !== null ? (v*100).toFixed(2) : null; }),
+          borderColor: COLORS[t],
+          backgroundColor: COLORS[t] + '33',
+          borderWidth: 2,
+          fill: false,
+          tension: 0.3,
+          pointRadius: 0,
+        };
       });
       charts['volChart'] = new Chart(vc, {
-        type: 'line', data: { labels: volData[tks[0]].dates, datasets: volDatasets },
-        options: { responsive: true, interaction: { mode: 'index', intersect: false },
-          plugins: { legend: { labels: { color: tickColor } } },
-          scales: { x: { ticks: { color: tickColor, maxRotation: 0, maxTicksLimit: 8 }, grid: { color: darkGridColor } }, y: { ticks: { color: tickColor, callback: function(v){ return v+'%'; } }, grid: { color: darkGridColor } } } }
+        type: 'line',
+        data: { labels: volLabels, datasets: volDatasets },
+        options: {
+          responsive: true,
+          interaction: { mode: 'index', intersect: false },
+          plugins: { legend: { labels: { color: tickColor }}},
+          scales: {
+            x: { ticks: { color: tickColor, maxRotation: 0, maxTicksLimit: 8, font: { size: 11 }}, grid: { color: darkGridColor }},
+            y: { ticks: { color: tickColor, font: { size: 11 }, callback: function(v) { return v + '%'; }}, grid: { color: darkGridColor }}
+          }
+        }
       });
     }
   }
 
-  $http.get('data.json').then(function(resp) {
-    $scope.data   = resp.data;
-    $scope.tickers = resp.data.tickers;
-    $scope.stats  = resp.data.stats;
-    $scope.corrMatrix = resp.data.correlation.matrix;
-    $scope.loading = false;
-    var tks = resp.data.tickers;
-    var pairs = [];
-    for (var i = 0; i < tks.length; i++) {
-      for (var j = i + 1; j < tks.length; j++) {
+  var REFRESH_MS = 2 * 60 * 1000; // re-fetch data.json every 2 minutes
+
+  function applyData(d) {
+    $scope.data        = d;
+    $scope.tickers     = d.tickers;
+    $scope.stats       = d.stats;
+    $scope.corrMatrix  = d.correlation.matrix;
+
+    var tks = d.tickers, pairs = [];
+    for (var i = 0; i < tks.length; i++)
+      for (var j = i + 1; j < tks.length; j++)
         pairs.push({ a: tks[i], b: tks[j], val: $scope.corrMatrix[i][j] });
-      }
-    }
     $scope.corrPairs = pairs;
+
     $scope.corrInsights = [
       { title: 'SOXL ≈ 3× SOXX', text: 'SOXL replicates 3× the daily return of SOXX. Correlation is very high (~0.96) but leverage decay means long-term returns diverge significantly in volatile markets.' },
       { title: 'TQQQ ≈ 3× QQQ', text: 'TQQQ seeks 3× daily QQQ performance. Correlation with QQQ is near perfect (~0.97). Due to daily rebalancing, TQQQ underperforms 3× QQQ in choppy markets (volatility drag).' },
       { title: 'SOXX vs QQQ', text: 'Semiconductors are a large QQQ component. SOXX-QQQ correlation is high (~0.89), but SOXX has additional sector-specific risk: earnings cycles, geopolitical chip supply.' },
       { title: 'Cross-fund diversification', text: 'All four funds are highly correlated with tech. Holding a mix offers limited diversification — the primary difference is leverage (and thus risk) level, not sector exposure.' }
     ];
-    $timeout(function() { drawCharts('overview'); }, 100);
-  }, function(err) {
-    $scope.loading = false;
-    $scope.error = 'Failed to load data.json. ' + (err.status === 404 ? 'Run generate_data.py first.' : 'Status: ' + err.status);
-  });
+  }
+
+  // ── Load data (with cache-bust so browser always fetches latest) ────
+  function loadData(isRefresh) {
+    var url = 'data.json?t=' + Date.now();
+    $http.get(url).then(function(resp) {
+      var prev = $scope.data ? $scope.data.generated_at : null;
+      applyData(resp.data);
+      if (!isRefresh) {
+        $scope.loading = false;
+        $timeout(function() { drawCharts('overview'); }, 100);
+      } else if (resp.data.generated_at !== prev) {
+        // data actually changed — redraw current tab
+        $timeout(function() { drawCharts($scope.activeTab); }, 50);
+      }
+      $scope.lastRefresh = new Date().toLocaleTimeString();
+    }, function(err) {
+      if (!isRefresh) {
+        $scope.loading = false;
+        $scope.error = 'Failed to load data.json. ' + (err.status === 404 ? 'Run fetch_stats.py first.' : 'Status: ' + err.status);
+      }
+    });
+  }
+
+  loadData(false);
+  setInterval(function() { $scope.$apply(function() { loadData(true); }); }, REFRESH_MS);
 
 }]);
 </script>

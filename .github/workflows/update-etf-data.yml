@@ -1,0 +1,37 @@
+name: Update ETF Data
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'   # every 5 min (GitHub's minimum)
+  workflow_dispatch:          # also allow manual trigger from GitHub UI
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/stock-correlation-dashboard-pSdXk
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: astral-sh/setup-uv@v4
+
+      - name: Fetch live stock data
+        run: uv run fetch_stats.py
+
+      - name: Minify data.json
+        run: python3 -c "import json; d=json.load(open('docs/data.json')); json.dump(d, open('docs/data.json','w'), separators=(',',':'))"
+
+      - name: Save data for gh-pages
+        run: cp docs/data.json /tmp/data.json
+
+      - name: Push to gh-pages
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout gh-pages
+          cp /tmp/data.json docs/data.json
+          git add docs/data.json
+          git diff --staged --quiet || git commit -m "Auto-update ETF data $(date -u +'%Y-%m-%d %H:%M UTC')"
+          git push origin gh-pages

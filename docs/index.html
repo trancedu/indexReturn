@@ -330,6 +330,9 @@
         </div>
         <div class="d-flex align-items-center gap-2">
           <span class="ts-badge"><i class="bi bi-clock me-1"></i>{{data.generated_at | date:'mediumDate'}}</span>
+          <span class="ts-badge" style="color:var(--accent-green)" ng-if="lastRefresh">
+            <i class="bi bi-arrow-repeat me-1"></i>{{lastRefresh}}
+          </span>
           <span class="ts-badge" style="color:var(--accent-yellow)" ng-if="data.note">
             <i class="bi bi-info-circle me-1"></i>Simulated
           </span>
@@ -1113,52 +1116,52 @@ angular.module('stockDashboard', [])
     }
   }
 
-  // ── Load data ─────────────────────────────────────────────────────────
-  $http.get('data.json').then(function(resp) {
-    $scope.data   = resp.data;
-    $scope.tickers = resp.data.tickers;
-    $scope.stats  = resp.data.stats;
-    $scope.corrMatrix = resp.data.correlation.matrix;
-    $scope.loading = false;
+  var REFRESH_MS = 2 * 60 * 1000; // re-fetch data.json every 2 minutes
 
-    // Build correlation pairs for overview tab
-    var tks = resp.data.tickers;
-    var pairs = [];
-    for (var i = 0; i < tks.length; i++) {
-      for (var j = i + 1; j < tks.length; j++) {
+  function applyData(d) {
+    $scope.data        = d;
+    $scope.tickers     = d.tickers;
+    $scope.stats       = d.stats;
+    $scope.corrMatrix  = d.correlation.matrix;
+
+    var tks = d.tickers, pairs = [];
+    for (var i = 0; i < tks.length; i++)
+      for (var j = i + 1; j < tks.length; j++)
         pairs.push({ a: tks[i], b: tks[j], val: $scope.corrMatrix[i][j] });
-      }
-    }
     $scope.corrPairs = pairs;
 
-    // Correlation insights
     $scope.corrInsights = [
-      {
-        title: 'SOXL ≈ 3× SOXX',
-        text: 'SOXL replicates 3× the daily return of SOXX. Correlation is very high (~0.96) but leverage decay means long-term returns diverge significantly in volatile markets.'
-      },
-      {
-        title: 'TQQQ ≈ 3× QQQ',
-        text: 'TQQQ seeks 3× daily QQQ performance. Correlation with QQQ is near perfect (~0.97). Due to daily rebalancing, TQQQ underperforms 3× QQQ in choppy markets (volatility drag).'
-      },
-      {
-        title: 'SOXX vs QQQ',
-        text: 'Semiconductors are a large QQQ component. SOXX-QQQ correlation is high (~0.89), but SOXX has additional sector-specific risk: earnings cycles, geopolitical chip supply.'
-      },
-      {
-        title: 'Cross-fund diversification',
-        text: 'All four funds are highly correlated with tech. Holding a mix offers limited diversification — the primary difference is leverage (and thus risk) level, not sector exposure.'
-      }
+      { title: 'SOXL ≈ 3× SOXX', text: 'SOXL replicates 3× the daily return of SOXX. Correlation is very high (~0.96) but leverage decay means long-term returns diverge significantly in volatile markets.' },
+      { title: 'TQQQ ≈ 3× QQQ', text: 'TQQQ seeks 3× daily QQQ performance. Correlation with QQQ is near perfect (~0.97). Due to daily rebalancing, TQQQ underperforms 3× QQQ in choppy markets (volatility drag).' },
+      { title: 'SOXX vs QQQ', text: 'Semiconductors are a large QQQ component. SOXX-QQQ correlation is high (~0.89), but SOXX has additional sector-specific risk: earnings cycles, geopolitical chip supply.' },
+      { title: 'Cross-fund diversification', text: 'All four funds are highly correlated with tech. Holding a mix offers limited diversification — the primary difference is leverage (and thus risk) level, not sector exposure.' }
     ];
+  }
 
-    $timeout(function() { drawCharts('overview'); }, 100);
+  // ── Load data (with cache-bust so browser always fetches latest) ──────
+  function loadData(isRefresh) {
+    var url = 'data.json?t=' + Date.now();
+    $http.get(url).then(function(resp) {
+      var prev = $scope.data ? $scope.data.generated_at : null;
+      applyData(resp.data);
+      if (!isRefresh) {
+        $scope.loading = false;
+        $timeout(function() { drawCharts('overview'); }, 100);
+      } else if (resp.data.generated_at !== prev) {
+        // data actually changed — redraw current tab
+        $timeout(function() { drawCharts($scope.activeTab); }, 50);
+      }
+      $scope.lastRefresh = new Date().toLocaleTimeString();
+    }, function(err) {
+      if (!isRefresh) {
+        $scope.loading = false;
+        $scope.error = 'Failed to load data.json. ' + (err.status === 404 ? 'Run fetch_stats.py first.' : 'Status: ' + err.status);
+      }
+    });
+  }
 
-  }, function(err) {
-    $scope.loading = false;
-    $scope.error   = 'Failed to load data.json. ' + (err.status === 404
-      ? 'Run generate_data.py first.'
-      : 'Status: ' + err.status);
-  });
+  loadData(false);
+  setInterval(function() { $scope.$apply(function() { loadData(true); }); }, REFRESH_MS);
 
 }]);
 </script>

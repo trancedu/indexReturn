@@ -157,7 +157,7 @@ def main():
             "beta_vs_spy": safe(beta(r_aligned.values, b_aligned.values)),
             "beta_vs_qqq": safe(
                 beta(
-                    *[v.values for v in pd.concat([r, qqq_ret], axis=1).dropna().T.values]
+                    *[v for v in pd.concat([r, qqq_ret], axis=1).dropna().values.T]
                 ) if qqq_ret is not None and ticker != "QQQ" else 1.0
             ),
         }

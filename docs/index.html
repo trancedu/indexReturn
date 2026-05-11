@@ -370,13 +370,13 @@
 
             <!-- 52-week range bar -->
             <div class="mb-3">
-              <div class="d-flex justify-content-between" style="font-size:10px;color:var(--text-muted);margin-bottom:4px">
-                <span>${{stats[t]['52w_low'] | number:2}}</span>
-                <span style="font-size:10px">52-Week Range</span>
-                <span>${{stats[t]['52w_high'] | number:2}}</span>
-              </div>
-              <div class="range-bar">
+              <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px;text-align:center;letter-spacing:.3px">52-WEEK RANGE</div>
+              <div class="range-bar mb-1">
                 <div class="range-dot" style="left:{{rangePos(t)}}%;background:{{tickerColor(t)}}"></div>
+              </div>
+              <div class="d-flex justify-content-between">
+                <span style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--text-muted)">${{stats[t]['52w_low'] | number:2}}</span>
+                <span style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--text-muted)">${{stats[t]['52w_high'] | number:2}}</span>
               </div>
             </div>
 
